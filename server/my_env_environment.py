@@ -52,7 +52,7 @@ class ClinicalTriageEnv:
         gt = self.state["ground_truth"]
         cfg = self.difficulty_config[self.task_name]
 
-        reward = 0.01
+        reward = 0.5
         done = False
 
         try:
@@ -66,7 +66,8 @@ class ClinicalTriageEnv:
                 if self.task_name == "hard":
                     info_gain += 0.18
 
-                reward = info_gain - cfg["noise"]
+                raw = info_gain - cfg["noise"]
+                reward = (raw + 1) / 2
 
                 hints = [
                     "uncertain progression",
@@ -82,10 +83,10 @@ class ClinicalTriageEnv:
 
             self.state["last_action"] = action.type
 
-            return self._obs(), max(0.01, min(0.99, reward)), done, {"error": None}
+            return self._obs(), max(1e-6, min(1 - 1e-6, reward)), done, {"error": None}
 
         except Exception as e:
-            return self._obs(), 0.01, True, {"error": str(e)}
+            return self._obs(), 0.5, True, {"error": str(e)}
 
     # ---------------- DISEASE MODEL (LEADERBOARD CORE) ----------------
     def _progress_disease(self):
@@ -204,22 +205,21 @@ class ClinicalTriageEnv:
             if action.type == "ask":
                 r += 0.2
 
-        # reduce harsh early penalties
             if self.step_count <= 2 and action.type == "triage":
-                r -= 0.2   
+                r -= 0.2
 
             if len(self.state["history"]) == 0 and action.type == "triage":
-                r -= 0.3   
+                r -= 0.3
 
-        # reward correct late decisions
             if self.step_count >= 3 and action.type == "triage":
                 r += 0.2
 
-        # small step penalty (not destructive)
             r -= 0.02 * self.step_count
 
-        r = (r + 1) / 2          # map [-1,1] → [0,1]
+        r = (r + 1) / 2
         r = max(1e-6, min(1 - 1e-6, r))
         return float(r)
-        def state(self):
-            return self.state
+
+    @property
+    def current_state(self):
+        return self.state
