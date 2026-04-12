@@ -1,8 +1,8 @@
 def _reward(self, action, gt):
 
-    r = 0.0
+    r = 0.01
 
-    urgency_map = {"low": 0.3, "medium": 0.6, "high": 1.0}
+    urgency_map = {"low": 0.3, "medium": 0.6, "high": 0.99}
 
     # correctness
     if action.urgency == gt["urgency"]:
@@ -29,4 +29,4 @@ def _reward(self, action, gt):
     # step penalty
     r -= 0.03 * self.step_count
 
-    return max(0.0, min(1.0, r))
+    return max(0.01, min(0.99, r))
