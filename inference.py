@@ -81,7 +81,7 @@ def run():
         step = 0
         done = False
 
-        while not done and step < 6:
+        while not done and step < 8:
             step += 1
 
             action_dict = get_action(obs)
