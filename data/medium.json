@@ -1,0 +1,9 @@
+[
+  {
+    "case_id": "M2",
+    "symptoms": "abdominal pain and nausea",
+    "urgency": "medium",
+    "department": "gastroenterology",
+    "next_step": "blood test"
+  }
+]

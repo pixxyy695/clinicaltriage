@@ -1,0 +1,7 @@
+name: clinical_triage_env
+entry_point: server.my_env_environment:ClinicalTriageEnv
+
+tasks:
+  - name: easy
+  - name: medium
+  - name: hard

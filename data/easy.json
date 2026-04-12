@@ -1,0 +1,9 @@
+[
+  {
+    "case_id": "E2",
+    "symptoms": "headache with slight fatigue",
+    "urgency": "low",
+    "department": "neurology",
+    "next_step": "basic checkup"
+  }
+]

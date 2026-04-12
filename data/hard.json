@@ -1,0 +1,9 @@
+[
+  {
+    "case_id": "H1",
+    "symptoms": "abdominal pain with misleading improvement and recurring nausea",
+    "urgency": "medium",
+    "department": "gastroenterology",
+    "next_step": "ultrasound"
+  }
+]
