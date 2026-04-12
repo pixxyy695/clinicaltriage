@@ -52,7 +52,7 @@ class ClinicalTriageEnv:
         gt = self.state["ground_truth"]
         cfg = self.difficulty_config[self.task_name]
 
-        reward = 0.0
+        reward = 0.01
         done = False
 
         try:
