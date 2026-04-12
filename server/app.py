@@ -28,16 +28,23 @@ Usage:
     python -m server.app
 """
 from fastapi import FastAPI
-from models import Observation, Action
+from fastapi.responses import RedirectResponse
+from models import Action, Observation
 from server.my_env_environment import ClinicalTriageEnv
+from threading import Lock
 
 app = FastAPI()
 
 env = None
 obs = None
+lock = Lock()
 
 
+def _safe(x: float) -> float:
+    return max(0.0001, min(0.9900, float(x)))
 
+
+# ---------------- RESET ----------------
 @app.post("/reset")
 def reset(task: str = "easy"):
     global env, obs
@@ -48,12 +55,16 @@ def reset(task: str = "easy"):
     return {
         "status": "reset done",
         "task": task,
-        "case_id": obs.case_id,
-        "symptoms": obs.symptoms,
-        "history": obs.history
+        "observation": {
+            "case_id": obs.case_id,
+            "symptoms": obs.symptoms,
+            "history": obs.history,
+            "status": obs.status
+        }
     }
 
 
+# ---------------- STEP ----------------
 @app.post("/step")
 def step(action: Action):
     global env, obs
@@ -61,23 +72,42 @@ def step(action: Action):
     if env is None:
         return {"error": "Call /reset first"}
 
-    obs, reward, done, info = env.step(action)
+    with lock:
+        obs, reward, done, info = env.step(action)
 
     return {
-        "obs": {
+        "observation": {
+            "case_id": obs.case_id,
             "symptoms": obs.symptoms,
-            "history": list(obs.history)
+            "history": list(obs.history),
+            "status": obs.status
         },
-        "reward": reward,
+        "reward": _safe(reward),
         "done": done,
         "info": info
     }
+
+
+# ---------------- HEALTH ----------------
+@app.get("/health")
+def health():
+    return {"status": "healthy"}
+
+
+# ---------------- REDIRECT ROOT → DOCS ----------------
 @app.get("/")
 def home():
-    return {"status": "Clinical Triage Env Running 🚀"}
+    return RedirectResponse(url="/docs")
+
+
+# ---------------- FIX HF /web → DOCS ----------------
+@app.get("/web")
+def web():
+    return RedirectResponse(url="/docs")
+
 
 def main():
-    print("Run with: uvicorn server.app:app --reload")
+    print("Run with: uvicorn server.app:app --host 0.0.0.0 --port 8000")
 
 
 if __name__ == "__main__":
