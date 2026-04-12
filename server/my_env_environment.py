@@ -18,7 +18,7 @@ class ClinicalTriageEnv:
         self.step_count = 0
 
         self.difficulty_config = {
-            "easy":   {"noise": 0.05, "mask": 0.05, "risk_scale": 1.0},
+            "easy":   {"noise": 0.05, "mask": 0.05, "risk_scale": 0.99},
             "medium": {"noise": 0.15, "mask": 0.25, "risk_scale": 1.3},
             "hard":   {"noise": 0.35, "mask": 0.60, "risk_scale": 1.8},
         }
@@ -82,10 +82,10 @@ class ClinicalTriageEnv:
 
             self.state["last_action"] = action.type
 
-            return self._obs(), max(0.0, min(1.0, reward)), done, {"error": None}
+            return self._obs(), max(0.01, min(0.99, reward)), done, {"error": None}
 
         except Exception as e:
-            return self._obs(), 0.0, True, {"error": str(e)}
+            return self._obs(), 0.01, True, {"error": str(e)}
 
     # ---------------- DISEASE MODEL (LEADERBOARD CORE) ----------------
     def _progress_disease(self):
@@ -117,7 +117,7 @@ class ClinicalTriageEnv:
             if random.random() < 0.6:
                 self.state["observed_symptoms"] += " | " + random.choice(deception)
 
-        self.state["true_risk"] = max(0.0, min(1.0, self.state["true_risk"]))
+        self.state["true_risk"] = max(0.01, min(0.99, self.state["true_risk"]))
 
         # trajectory signal (IMPORTANT)
         bucket = 0 if self.state["true_risk"] < 0.3 else 1 if self.state["true_risk"] < 0.6 else 2
