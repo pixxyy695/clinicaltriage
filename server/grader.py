@@ -1,13 +1,13 @@
 def check_urgency(pred, truth):
-    return 1.0 if pred == truth else 0.0
+    return 0.99 if pred == truth else 0.01
 
 
 def check_department(pred, truth):
-    return 1.0 if pred == truth else 0.0
+    return 0.99 if pred == truth else 0.01
 
 
 def check_next_step(pred, truth):
-    return 1.0 if pred == truth else 0.0
+    return 0.99 if pred == truth else 0.01
 
 
 def check_full(action, gt):

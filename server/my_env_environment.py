@@ -173,7 +173,7 @@ class ClinicalTriageEnv:
     # ---------------- REWARD ----------------
     def _reward(self, action, gt):
 
-        r = 0.0
+        r = 0.01
         risk = self.state["true_risk"]
 
         # correctness
@@ -218,6 +218,8 @@ class ClinicalTriageEnv:
         # small step penalty (not destructive)
             r -= 0.02 * self.step_count
 
-        return float(max(-1.0, min(1.0, r)))
+        r = (r + 1) / 2          # map [-1,1] → [0,1]
+        r = max(1e-6, min(1 - 1e-6, r))
+        return float(r)
         def state(self):
             return self.state
