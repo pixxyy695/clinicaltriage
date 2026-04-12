@@ -3,6 +3,10 @@ import random
 from models import Observation, Action
 
 
+def _safe(x: float) -> float:
+    return max(0.0001, min(0.9900, float(x)))
+
+
 class ClinicalTriageEnv:
 
     def __init__(self, task="easy"):
@@ -83,12 +87,12 @@ class ClinicalTriageEnv:
 
             self.state["last_action"] = action.type
 
-            return self._obs(), max(1e-6, min(1 - 1e-6, reward)), done, {"error": None}
+            return self._obs(), _safe(reward), done, {"error": None}
 
         except Exception as e:
-            return self._obs(), 0.5, True, {"error": str(e)}
+            return self._obs(), _safe(0.5), True, {"error": str(e)}
 
-    # ---------------- DISEASE MODEL (LEADERBOARD CORE) ----------------
+    # ---------------- DISEASE MODEL ----------------
     def _progress_disease(self):
 
         cfg = self.difficulty_config[self.task_name]
@@ -100,7 +104,6 @@ class ClinicalTriageEnv:
 
         self.state["true_risk"] += base * cfg["risk_scale"] + noise
 
-        # HARD MODE escalation
         if self.task_name == "hard":
 
             self.state["true_risk"] += 0.04 * (self.state["progression_step"] ** 1.25)
@@ -118,9 +121,8 @@ class ClinicalTriageEnv:
             if random.random() < 0.6:
                 self.state["observed_symptoms"] += " | " + random.choice(deception)
 
-        self.state["true_risk"] = max(0.01, min(0.99, self.state["true_risk"]))
+        self.state["true_risk"] = _safe(self.state["true_risk"])
 
-        # trajectory signal (IMPORTANT)
         bucket = 0 if self.state["true_risk"] < 0.3 else 1 if self.state["true_risk"] < 0.6 else 2
         if bucket != self.state["last_risk_bucket"]:
             self.state["trajectory_score"] += 0.05
@@ -174,10 +176,9 @@ class ClinicalTriageEnv:
     # ---------------- REWARD ----------------
     def _reward(self, action, gt):
 
-        r = 0.01
+        r = 0.5
         risk = self.state["true_risk"]
 
-        # correctness
         if action.urgency == gt["urgency"]:
             r += 0.3
         if action.department == gt["department"]:
@@ -185,21 +186,16 @@ class ClinicalTriageEnv:
         if action.next_step == gt["next_step"]:
             r += 0.2
 
-        # safety
         if gt["urgency"] == "high" and action.urgency == "low":
             r -= 0.4
 
-        # risk calibration
         if risk > 0.7:
             r += 0.4 if action.urgency == "high" else -0.3
-
         elif risk < 0.3:
             r += 0.1 if action.urgency == "low" else -0.2
 
-        # trajectory bonus
         r += 0.2 * self.state["trajectory_score"]
 
-        # HARD MODE logic
         if self.task_name == "hard":
 
             if action.type == "ask":
@@ -217,8 +213,7 @@ class ClinicalTriageEnv:
             r -= 0.02 * self.step_count
 
         r = (r + 1) / 2
-        r = max(1e-6, min(1 - 1e-6, r))
-        return float(r)
+        return _safe(r)
 
     @property
     def current_state(self):
