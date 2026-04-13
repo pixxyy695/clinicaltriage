@@ -1,7 +1,5 @@
 def _safe(x: float) -> float:
-    """
-    Force strict (0,1) bounds required by evaluator.
-    """
+    
     return max(1e-6, min(1 - 1e-6, float(x)))
 
 

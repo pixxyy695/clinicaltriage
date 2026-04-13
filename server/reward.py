@@ -14,16 +14,15 @@ def _reward(self, action, gt):
     if action.next_step == gt["next_step"]:
         r += 0.2
 
-    # 🔥 risk-aware penalty (NEW CORE FEATURE)
+    
     risk = self.state["risk_score"]
 
     if action.urgency == "low" and risk > 0.6:
-        r -= 0.7   # dangerous delay
+        r -= 0.7  
 
     if action.urgency == "high" and risk < 0.3:
-        r -= 0.2   # overreaction
-
-    # 🔥 delayed outcome shaping
+        r -= 0.2  
+    # delayed outcome shaping
     r += risk * 0.2
 
     # step penalty

@@ -10,17 +10,4 @@ The agent interacts with a partially observable medical environment and learns t
 - Infer patient risk progression
 - Make correct triage decisions under uncertainty
 
----
-
-## 🧩 Key Features
-
-- 🧠 POMDP-style clinical simulation environment
-- ⚡ Multi-step reasoning (Ask → Observe → Triage)
-- 🔥 Difficulty-aware reward shaping (easy / medium / hard)
-- 🧪 Stochastic disease progression model
-- 🎯 Strong safety + escalation penalties
-- 📊 Optimized for leaderboard scoring
-
----
-
 
