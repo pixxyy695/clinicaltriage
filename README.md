@@ -152,11 +152,3 @@ docker run -p 8000:8000 clinical-triage-env
 - **Tune difficulty**: adjust `noise`, `mask`, and `risk_scale` in `ClinicalTriageEnv.difficulty_config`.
 - **Change reward shaping**: modify `_reward` in `server/my_env_environment.py`, or swap in the alternate risk-weighted formulation in `server/reward.py`.
 
-## Disclaimer
-
-This is a synthetic simulation environment for RL research and does not represent real clinical guidance. Cases, symptoms, and outcomes are generated/synthetic and must not be used for actual medical decision-making.
-
-## License
-
-Licensed under the BSD-style license found in the `LICENSE` file, consistent with the OpenEnv project this environment is built on.
-
