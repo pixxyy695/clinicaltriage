@@ -109,7 +109,6 @@ The server exposes:
 | `/reset?task=easy` | POST | Start a new episode for `easy`, `medium`, or `hard` |
 | `/step` | POST | Submit an `Action`, receive the next `Observation`, reward, and done flag |
 | `/health` | GET | Health check |
-| `/docs` | GET | Interactive OpenAPI docs (also served at `/`) |
 
 ### Connect with the Python client
 
@@ -132,7 +131,7 @@ export HF_TOKEN=your_token_here          # or set API_BASE_URL / MODEL_NAME for 
 python inference.py
 ```
 
-This prints per-step rewards and a final summary for each task, and serves as a template for wiring up your own policy — rule-based, RL-trained, or LLM-based.
+This prints per-step rewards and a final summary for each task, and serves as a template for wiring up your own policy rule-based, RL-trained, or LLM-based.
 
 ### Run with Docker
 
@@ -140,10 +139,6 @@ This prints per-step rewards and a final summary for each task, and serves as a 
 docker build -t clinical-triage-env .
 docker run -p 8000:8000 clinical-triage-env
 ```
-
-## Evaluation
-
-`server/grader.py` provides a standalone scoring function, `check_full(action, gt)`, that compares a submitted action's `urgency`, `department`, and `next_step` against ground truth and returns a bounded score in `(0, 1)` — useful for offline evaluation or leaderboard scoring independent of the live reward signal used during rollouts.
 
 ## Extending the Environment
 
